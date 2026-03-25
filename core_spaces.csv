@@ -1,0 +1,7 @@
+space_id,floor,space_type,display_name,length_m,width_m,x_m,z_m,notes
+STAIR-A-F1,1,stair,Stair A,4,3,5,-5,
+LIFT-A-F1,1,lift,Lift A,3,3,12,-5,
+WASH-F1,1,washroom,Washroom,6,4,20,-5,
+STAIR-A-F2,2,stair,Stair A,4,3,5,-5,
+LIFT-A-F2,2,lift,Lift A,3,3,12,-5,
+WASH-F2,2,washroom,Washroom,6,4,20,-5,
