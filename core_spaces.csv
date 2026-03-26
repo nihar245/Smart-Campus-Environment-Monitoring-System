@@ -1,7 +1,18 @@
 space_id,floor,space_type,display_name,length_m,width_m,x_m,z_m,notes
-STAIR-A-F1,1,stair,Stair A,4,3,5,-5,
-LIFT-A-F1,1,lift,Lift A,3,3,12,-5,
-WASH-F1,1,washroom,Washroom,6,4,20,-5,
-STAIR-A-F2,2,stair,Stair A,4,3,5,-5,
-LIFT-A-F2,2,lift,Lift A,3,3,12,-5,
-WASH-F2,2,washroom,Washroom,6,4,20,-5,
+GIRLS-WASH-F1,1,washroom,Girls Washroom,8,6,39,0,Between N-103 and Stair A
+STAIR-A-F1,1,stair,Stair A,8,6,52,0,Between girls washroom and N-104
+STAIR-B-F1,1,stair,Stair B,8,6,104,0,After N-106
+BOYS-WASH-F1,1,washroom,Boys Washroom,8,6,117,0,After Stair B
+READING-F1,1,reading_room,Reading Room,12,8,130,0,Tail-end room on first floor
+GIRLS-WASH-F2,2,washroom,Girls Washroom,8,6,39,0,Between N-203 and Stair A
+STAIR-A-F2,2,stair,Stair A,8,6,52,0,Between girls washroom and N-204
+STAIR-B-F2,2,stair,Stair B,8,6,91,0,After N-205
+BOYS-WASH-F2,2,washroom,Boys Washroom,8,6,104,0,Before N-206 to N-209 block
+GIRLS-WASH-F3,3,washroom,Girls Washroom,8,6,39,0,Between N-303 and Stair A
+STAIR-A-F3,3,stair,Stair A,8,6,52,0,Between girls washroom and N-304
+STAIR-B-F3,3,stair,Stair B,8,6,91,0,After N-305
+BOYS-WASH-F3,3,washroom,Boys Washroom,8,6,104,0,Before N-306 to N-309 block
+GIRLS-WASH-F4,4,washroom,Girls Washroom,8,6,39,0,Between N-403 and Stair A
+STAIR-A-F4,4,stair,Stair A,8,6,52,0,Between girls washroom and N-404
+STAIR-B-F4,4,stair,Stair B,8,6,104,0,After N-406
+BOYS-WASH-F4,4,washroom,Boys Washroom,8,6,117,0,Before lab block 407 to 409

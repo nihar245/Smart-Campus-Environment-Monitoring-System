@@ -1,14 +1,41 @@
-import { useMemo, useState } from "react";
-import { Canvas } from "@react-three/fiber";
-import { Html, OrbitControls } from "@react-three/drei";
-import { buildSensorPositions } from "../data/nBlock3DLayout";
+import { useMemo, useRef, useState } from "react";
+import { Canvas, useFrame } from "@react-three/fiber";
+import { Html, OrbitControls, Text } from "@react-three/drei";
+import {
+  buildSensorPositions,
+  FLOOR_COUNT,
+  FLOOR_HEIGHT,
+  SECTION_COUNT,
+  SECTION_GAP,
+  SECTION_WIDTH
+} from "../data/nBlock3DLayout";
 import { getSensorStatusColor } from "../utils/roomHelpers";
 
 const ROOM_TYPE_STYLE = {
-  classroom: { color: "#4ea8de", width: 3.6, depth: 2.4 },
-  lab_small: { color: "#80ed99", width: 3.2, depth: 2.2 },
-  lab_medium: { color: "#ffd166", width: 3.8, depth: 2.4 }
+  classroom: { color: "#4ea8de", depth: 2.4 },
+  lab_small: { color: "#80ed99", depth: 2.4 },
+  lab_medium: { color: "#ffd166", depth: 2.4 }
 };
+
+const TOTAL_MODEL_WIDTH = SECTION_COUNT * SECTION_WIDTH + (SECTION_COUNT - 1) * SECTION_GAP;
+
+function getSectionRanges() {
+  const start = -TOTAL_MODEL_WIDTH * 0.5;
+
+  return Array.from({ length: SECTION_COUNT }, (_, index) => {
+    const x0 = start + index * (SECTION_WIDTH + SECTION_GAP);
+    const x1 = x0 + SECTION_WIDTH;
+    return { x0, x1, center: (x0 + x1) * 0.5 };
+  });
+}
+
+function getGapCenters() {
+  const sections = getSectionRanges();
+  return sections.slice(0, -1).map((section, idx) => {
+    const next = sections[idx + 1];
+    return (section.x1 + next.x0) * 0.5;
+  });
+}
 
 function getRoomTypeLabel(roomType) {
   if (roomType === "classroom") {
@@ -23,41 +50,155 @@ function getRoomTypeLabel(roomType) {
 function BuildingShell({ width, depth }) {
   const halfWidth = width * 0.5;
   const halfDepth = depth * 0.5;
+  const buildingHeight = (FLOOR_COUNT - 1) * FLOOR_HEIGHT + 2.2;
+  const coreHeight = buildingHeight + 1.1;
+  const coreY = coreHeight * 0.5;
+  const bandWidth = width * 0.92;
+  const wingWidth = width * 0.26;
+  const wingDepth = depth * 0.88;
 
   return (
     <group>
-      {[1, 2, 3, 4, 5].map((floor) => (
-        <mesh key={floor} position={[0, floor * 4 - 4, 0]}>
-          <boxGeometry args={[width, 0.22, depth]} />
-          <meshStandardMaterial color={floor % 2 === 0 ? "#2f4858" : "#335c67"} opacity={0.9} transparent />
+      {[...Array(FLOOR_COUNT)].map((_, index) => {
+        const slabY = index * FLOOR_HEIGHT;
+        const slabTone = index % 2 === 0 ? "#2f4858" : "#335c67";
+
+        return (
+          <group key={`slab-${index}`}>
+            <mesh position={[0, slabY, 0]}>
+              <boxGeometry args={[width, 0.22, depth]} />
+              <meshStandardMaterial color={slabTone} opacity={0.32} transparent depthWrite={false} />
+            </mesh>
+            <mesh position={[0, slabY + 0.14, 0]}>
+              <boxGeometry args={[width * 0.98, 0.03, depth * 0.98]} />
+              <meshBasicMaterial color="#6fe8ff" transparent opacity={0.36} />
+            </mesh>
+          </group>
+        );
+      })}
+
+      {/* Wing-style facade massing inspired by the real N-block front profile */}
+      <mesh position={[-width * 0.34, coreY, 0]}>
+        <boxGeometry args={[wingWidth, buildingHeight, wingDepth]} />
+        <meshStandardMaterial color="#ad7a66" transparent opacity={0.12} depthWrite={false} />
+      </mesh>
+      <mesh position={[0, coreY, 0]}>
+        <boxGeometry args={[wingWidth * 1.1, buildingHeight, wingDepth]} />
+        <meshStandardMaterial color="#6d808d" transparent opacity={0.1} depthWrite={false} />
+      </mesh>
+      <mesh position={[width * 0.34, coreY, 0]}>
+        <boxGeometry args={[wingWidth, buildingHeight, wingDepth]} />
+        <meshStandardMaterial color="#ad7a66" transparent opacity={0.12} depthWrite={false} />
+      </mesh>
+
+      {/* Vertical core towers between sections */}
+      {getGapCenters().map((x, idx) => (
+        <mesh key={`shell-core-${idx}`} position={[x, coreY + 0.2, 0]}>
+          <boxGeometry args={[SECTION_GAP * 0.9, coreHeight, depth * 0.8]} />
+          <meshStandardMaterial color="#7b8e99" transparent opacity={0.12} depthWrite={false} />
         </mesh>
       ))}
-      <mesh position={[0, 8, -halfDepth]}>
-        <boxGeometry args={[width, 20, 0.2]} />
-        <meshStandardMaterial color="#1f2d3a" opacity={0.35} transparent />
+
+      {/* Horizontal facade bands to give fuller height expression */}
+      {[...Array(FLOOR_COUNT)].map((_, index) => (
+        <mesh key={`facade-band-${index}`} position={[0, index * FLOOR_HEIGHT + 0.9, -halfDepth + 0.35]}>
+          <boxGeometry args={[bandWidth, 0.18, 0.22]} />
+          <meshBasicMaterial color="#93def5" transparent opacity={0.3} />
+        </mesh>
+      ))}
+
+      <mesh position={[0, coreY, -halfDepth]}>
+        <boxGeometry args={[width, buildingHeight, 0.2]} />
+        <meshStandardMaterial color="#1f2d3a" opacity={0.08} transparent depthWrite={false} />
       </mesh>
-      <mesh position={[0, 8, halfDepth]}>
-        <boxGeometry args={[width, 20, 0.2]} />
-        <meshStandardMaterial color="#1f2d3a" opacity={0.35} transparent />
+      <mesh position={[0, coreY, halfDepth]}>
+        <boxGeometry args={[width, buildingHeight, 0.2]} />
+        <meshStandardMaterial color="#1f2d3a" opacity={0.08} transparent depthWrite={false} />
       </mesh>
-      <mesh position={[-halfWidth, 8, 0]}>
-        <boxGeometry args={[0.2, 20, depth]} />
-        <meshStandardMaterial color="#1f2d3a" opacity={0.35} transparent />
+      <mesh position={[-halfWidth, coreY, 0]}>
+        <boxGeometry args={[0.2, buildingHeight, depth]} />
+        <meshStandardMaterial color="#1f2d3a" opacity={0.08} transparent depthWrite={false} />
       </mesh>
-      <mesh position={[halfWidth, 8, 0]}>
-        <boxGeometry args={[0.2, 20, depth]} />
-        <meshStandardMaterial color="#1f2d3a" opacity={0.35} transparent />
+      <mesh position={[halfWidth, coreY, 0]}>
+        <boxGeometry args={[0.2, buildingHeight, depth]} />
+        <meshStandardMaterial color="#1f2d3a" opacity={0.08} transparent depthWrite={false} />
       </mesh>
     </group>
   );
 }
 
-function RoomBoundaries({ rooms, positions }) {
+function ArchitecturalGuides({ depth, showDividers, showCores, hoveredCore, onHoverCore }) {
+  const gapCenters = getGapCenters();
+  const sectionRanges = getSectionRanges();
+
+  return (
+    <group>
+      {showDividers
+        ? sectionRanges.map((section, idx) => (
+            <mesh key={`section-guide-${idx}`} position={[section.center, ((FLOOR_COUNT - 1) * FLOOR_HEIGHT + 2) * 0.5, 0]}>
+              <boxGeometry args={[SECTION_WIDTH, (FLOOR_COUNT - 1) * FLOOR_HEIGHT + 2, depth * 0.98]} />
+              <meshBasicMaterial color="#5ec8ff" transparent opacity={0.06} wireframe />
+            </mesh>
+          ))
+        : null}
+
+      {showDividers
+        ? gapCenters.flatMap((x, idx) => [
+            <mesh key={`divider-plane-${idx}`} position={[x, ((FLOOR_COUNT - 1) * FLOOR_HEIGHT + 2) * 0.5, 0]}>
+              <boxGeometry args={[0.22, (FLOOR_COUNT - 1) * FLOOR_HEIGHT + 2, depth * 0.98]} />
+              <meshStandardMaterial color="#80edff" emissive="#67d8ff" emissiveIntensity={0.35} transparent opacity={0.26} />
+            </mesh>,
+            <mesh key={`divider-glow-${idx}`} position={[x, ((FLOOR_COUNT - 1) * FLOOR_HEIGHT + 2) * 0.5, 0]}>
+              <boxGeometry args={[0.5, (FLOOR_COUNT - 1) * FLOOR_HEIGHT + 2, depth * 0.2]} />
+              <meshBasicMaterial color="#6dd3ff" transparent opacity={0.18} />
+            </mesh>
+          ])
+        : null}
+
+      {showCores
+        ? gapCenters.map((x, idx) => {
+            const coreId = idx === 0 ? "Core A: Girls WC + Stairs" : "Core B: Stairs + Boys WC";
+            const active = hoveredCore === coreId;
+
+            return (
+              <group
+                key={`core-${idx}`}
+                position={[x, ((FLOOR_COUNT - 1) * FLOOR_HEIGHT + 2) * 0.5, 0]}
+                onPointerOver={(event) => {
+                  event.stopPropagation();
+                  onHoverCore(coreId);
+                }}
+                onPointerOut={() => onHoverCore("")}
+              >
+                <mesh>
+                  <boxGeometry args={[SECTION_GAP * 0.82, (FLOOR_COUNT - 1) * FLOOR_HEIGHT + 2, depth * 0.72]} />
+                  <meshStandardMaterial
+                    color={active ? "#8cf8ff" : "#47a8bd"}
+                    emissive="#5de2ff"
+                    emissiveIntensity={active ? 0.52 : 0.24}
+                    transparent
+                    opacity={0.3}
+                  />
+                </mesh>
+                <mesh>
+                  <boxGeometry args={[SECTION_GAP * 0.9, (FLOOR_COUNT - 1) * FLOOR_HEIGHT + 2.05, depth * 0.78]} />
+                  <meshBasicMaterial color="#7dd9ff" wireframe transparent opacity={0.52} />
+                </mesh>
+              </group>
+            );
+          })
+        : null}
+    </group>
+  );
+}
+
+function RoomBoundaries({ rooms, positions, showRoomIds }) {
   return (
     <group>
       {rooms.map((room) => {
         const pos = positions[room.roomId];
         const style = ROOM_TYPE_STYLE[room.roomType] || ROOM_TYPE_STYLE.classroom;
+        const boundaryWidth = Math.max(1.4, (pos?.cellWidth || 3.6) - 0.3);
 
         if (!pos) {
           return null;
@@ -65,18 +206,55 @@ function RoomBoundaries({ rooms, positions }) {
 
         return (
           <group key={`${room.roomId}-cell`} position={[pos.x, pos.y - 0.08, pos.z]}>
-            <mesh>
-              <boxGeometry args={[style.width, 0.12, style.depth]} />
-              <meshStandardMaterial color={style.color} transparent opacity={0.22} />
+            <mesh renderOrder={20}>
+              <boxGeometry args={[boundaryWidth, 0.12, style.depth]} />
+              <meshStandardMaterial color={style.color} transparent opacity={0.24} depthTest={false} depthWrite={false} />
             </mesh>
-            <mesh>
-              <boxGeometry args={[style.width, 0.14, style.depth]} />
-              <meshBasicMaterial color={style.color} wireframe transparent opacity={0.9} />
+            <mesh renderOrder={21}>
+              <boxGeometry args={[boundaryWidth, 0.14, style.depth]} />
+              <meshBasicMaterial color={style.color} wireframe transparent opacity={0.95} depthTest={false} depthWrite={false} />
             </mesh>
+
+            {showRoomIds ? (
+              <Text
+                position={[0, 0.04, 0]}
+                rotation={[-Math.PI / 2, 0, 0]}
+                fontSize={Math.max(0.35, Math.min(0.56, boundaryWidth * 0.16))}
+                color="#dffbff"
+                anchorX="center"
+                anchorY="middle"
+                maxWidth={boundaryWidth * 0.86}
+                renderOrder={22}
+              >
+                {room.roomId}
+              </Text>
+            ) : null}
           </group>
         );
       })}
     </group>
+  );
+}
+
+function SensorPulse({ color, active }) {
+  const ringRef = useRef(null);
+
+  useFrame((state) => {
+    if (!ringRef.current) {
+      return;
+    }
+
+    const t = state.clock.getElapsedTime();
+    const pulse = 1 + Math.sin(t * 3.6) * 0.16;
+    ringRef.current.scale.set(pulse, pulse, pulse);
+    ringRef.current.material.opacity = active ? 0.88 : 0.56;
+  });
+
+  return (
+    <mesh ref={ringRef} rotation={[Math.PI / 2, 0, 0]} position={[0, -0.2, 0]}>
+      <ringGeometry args={[0.45, 0.62, 40]} />
+      <meshBasicMaterial color={color} transparent opacity={0.56} />
+    </mesh>
   );
 }
 
@@ -89,7 +267,6 @@ function SensorNodes({
   onSelectRoom,
   onHoverRoom
 }) {
-
   return (
     <group>
       {rooms.map((room) => {
@@ -120,6 +297,8 @@ function SensorNodes({
               <meshStandardMaterial emissive={color} emissiveIntensity={0.7} color={color} />
             </mesh>
 
+            <SensorPulse color={color} active={isSelected || isHovered} />
+
             {isHovered ? (
               <Html position={[0, 0.9, 0]} center distanceFactor={12} className="map-tooltip-wrap">
                 <div className="map-tooltip">
@@ -138,6 +317,12 @@ function SensorNodes({
 
 export default function ThreeDMap({ rooms, readings, selectedRoomId, onSelectRoom }) {
   const [hoveredRoomId, setHoveredRoomId] = useState("");
+  const [hoveredCore, setHoveredCore] = useState("");
+  const [showDividers, setShowDividers] = useState(true);
+  const [showCores, setShowCores] = useState(true);
+  const [showBoundaries, setShowBoundaries] = useState(true);
+  const [showRoomIds, setShowRoomIds] = useState(true);
+  const [autoRotate, setAutoRotate] = useState(false);
 
   const readingsByRoom = useMemo(() => {
     return readings.reduce((acc, item) => {
@@ -154,13 +339,13 @@ export default function ThreeDMap({ rooms, readings, selectedRoomId, onSelectRoo
     }
 
     const xs = points.map((point) => point.x);
-    const width = Math.max(24, Math.max(...xs) - Math.min(...xs) + 10);
+    const width = Math.max(TOTAL_MODEL_WIDTH + 6, Math.max(...xs) - Math.min(...xs) + 10);
 
     return { width, depth: 12 };
   }, [sensorPositions]);
 
   const cameraPosition = useMemo(
-    () => [Math.max(26, buildingSize.width * 0.58), 24, Math.max(22, buildingSize.width * 0.48)],
+    () => [Math.max(26, buildingSize.width * 0.58), 28, Math.max(22, buildingSize.width * 0.48)],
     [buildingSize.width]
   );
 
@@ -183,8 +368,16 @@ export default function ThreeDMap({ rooms, readings, selectedRoomId, onSelectRoo
           <color attach="background" args={["#0b132b"]} />
           <ambientLight intensity={0.75} />
           <directionalLight position={[20, 30, 16]} intensity={1.2} />
+          <pointLight position={[0, 22, 0]} intensity={1.1} color="#4fd8ff" />
           <BuildingShell width={buildingSize.width} depth={buildingSize.depth} />
-          <RoomBoundaries rooms={rooms} positions={sensorPositions} />
+          <ArchitecturalGuides
+            depth={buildingSize.depth}
+            showDividers={showDividers}
+            showCores={showCores}
+            hoveredCore={hoveredCore}
+            onHoverCore={setHoveredCore}
+          />
+          {showBoundaries ? <RoomBoundaries rooms={rooms} positions={sensorPositions} showRoomIds={showRoomIds} /> : null}
           <SensorNodes
             rooms={rooms}
             positions={sensorPositions}
@@ -194,7 +387,15 @@ export default function ThreeDMap({ rooms, readings, selectedRoomId, onSelectRoo
             onSelectRoom={onSelectRoom}
             onHoverRoom={setHoveredRoomId}
           />
-          <OrbitControls makeDefault enablePan enableZoom minDistance={15} maxDistance={80} />
+          <OrbitControls
+            makeDefault
+            enablePan
+            enableZoom
+            minDistance={15}
+            maxDistance={80}
+            autoRotate={autoRotate}
+            autoRotateSpeed={0.7}
+          />
         </Canvas>
       </div>
 
@@ -202,6 +403,26 @@ export default function ThreeDMap({ rooms, readings, selectedRoomId, onSelectRoo
         <h3>N Block Sensor Map</h3>
         <p>Rotate and zoom to inspect room boundaries and sensor nodes.</p>
         <p className="sensor-count">Sensors rendered: {rooms.length}/53</p>
+        <p className="sensor-count">Core status: {hoveredCore || "None selected"}</p>
+
+        <div className="map-controls">
+          <button type="button" onClick={() => setShowBoundaries((prev) => !prev)}>
+            {showBoundaries ? "Hide" : "Show"} Room Boundaries
+          </button>
+          <button type="button" onClick={() => setShowRoomIds((prev) => !prev)}>
+            {showRoomIds ? "Hide" : "Show"} Room/Lab IDs
+          </button>
+          <button type="button" onClick={() => setShowDividers((prev) => !prev)}>
+            {showDividers ? "Hide" : "Show"} Section Dividers
+          </button>
+          <button type="button" onClick={() => setShowCores((prev) => !prev)}>
+            {showCores ? "Hide" : "Show"} Stair/WC Cores
+          </button>
+          <button type="button" onClick={() => setAutoRotate((prev) => !prev)}>
+            {autoRotate ? "Stop" : "Start"} Auto Rotate
+          </button>
+        </div>
+
         <ul>
           <li>
             <span className="dot normal" /> Normal
@@ -224,6 +445,9 @@ export default function ThreeDMap({ rooms, readings, selectedRoomId, onSelectRoo
           </li>
           <li>
             <span className="dot lab-medium" /> Medium Lab
+          </li>
+          <li>
+            <span className="dot core" /> Stair/Washroom Core
           </li>
         </ul>
 

@@ -1,15 +1,64 @@
 import {
-  Line,
-  LineChart,
+  Area,
+  AreaChart,
+  CartesianGrid,
+  Legend,
+  ReferenceLine,
   ResponsiveContainer,
   Tooltip,
   XAxis,
-  YAxis,
-  CartesianGrid,
-  Legend
+  YAxis
 } from "recharts";
 
-export default function SensorChart({ data }) {
+const METRIC_CONFIG = {
+  temperature: {
+    label: "Temperature",
+    unit: "degC",
+    color: "#ff9f43",
+    domain: [18, 45],
+    threshold: 40
+  },
+  humidity: {
+    label: "Humidity",
+    unit: "%",
+    color: "#7ae582",
+    domain: [20, 90]
+  },
+  co2: {
+    label: "CO2",
+    unit: "ppm",
+    color: "#ffd166",
+    domain: [300, 1400],
+    threshold: 900
+  },
+  occupancyPct: {
+    label: "Occupancy",
+    unit: "%",
+    color: "#70d6ff",
+    domain: [0, 120],
+    threshold: 80
+  }
+};
+
+function TrendTooltip({ active, payload, label, metricConfig }) {
+  if (!active || !payload?.length) {
+    return null;
+  }
+
+  const value = Number(payload[0].value);
+  return (
+    <div className="trend-tooltip">
+      <p>{label}</p>
+      <strong>
+        {value.toFixed(metricConfig.unit === "ppm" ? 0 : 1)} {metricConfig.unit}
+      </strong>
+    </div>
+  );
+}
+
+export default function SensorChart({ data, metric = "temperature" }) {
+  const metricConfig = METRIC_CONFIG[metric] || METRIC_CONFIG.temperature;
+
   const rows = data.map((item) => ({
     ...item,
     time: new Date(item.timestamp).toLocaleTimeString()
@@ -18,18 +67,37 @@ export default function SensorChart({ data }) {
   return (
     <div className="sensor-chart">
       <ResponsiveContainer width="100%" height={320}>
-        <LineChart data={rows}>
+        <AreaChart data={rows}>
+          <defs>
+            <linearGradient id="trendFill" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor={metricConfig.color} stopOpacity={0.72} />
+              <stop offset="85%" stopColor={metricConfig.color} stopOpacity={0.04} />
+            </linearGradient>
+          </defs>
           <CartesianGrid strokeDasharray="4 4" stroke="rgba(255, 255, 255, 0.15)" />
           <XAxis dataKey="time" tick={{ fill: "#d6f0ef", fontSize: 11 }} />
-          <YAxis yAxisId="temp" domain={[20, 45]} tick={{ fill: "#d6f0ef", fontSize: 11 }} />
-          <YAxis yAxisId="co2" orientation="right" domain={[300, 1200]} tick={{ fill: "#d6f0ef", fontSize: 11 }} />
-          <Tooltip />
+          <YAxis domain={metricConfig.domain} tick={{ fill: "#d6f0ef", fontSize: 11 }} />
+          <Tooltip content={<TrendTooltip metricConfig={metricConfig} />} />
           <Legend />
-          <Line yAxisId="temp" type="monotone" dataKey="temperature" stroke="#ff9f43" dot={false} name="Temp (°C)" />
-          <Line yAxisId="temp" type="monotone" dataKey="humidity" stroke="#7ae582" dot={false} name="Humidity (%)" />
-          <Line yAxisId="co2" type="monotone" dataKey="co2" stroke="#ffd166" dot={false} name="CO₂ (ppm)" />
-          <Line yAxisId="temp" type="monotone" dataKey="occupancyPct" stroke="#70d6ff" dot={false} name="Occupancy (%)" />
-        </LineChart>
+          <Area
+            type="monotone"
+            dataKey={metric}
+            stroke={metricConfig.color}
+            strokeWidth={3}
+            fill="url(#trendFill)"
+            dot={false}
+            name={`${metricConfig.label} (${metricConfig.unit})`}
+            isAnimationActive
+          />
+          {metricConfig.threshold ? (
+            <ReferenceLine
+              y={metricConfig.threshold}
+              stroke="#ff595e"
+              strokeDasharray="5 5"
+              label={{ value: "Alert", position: "insideTopRight", fill: "#ffd0d1", fontSize: 11 }}
+            />
+          ) : null}
+        </AreaChart>
       </ResponsiveContainer>
     </div>
   );
