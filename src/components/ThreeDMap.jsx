@@ -12,9 +12,9 @@ import {
 import { getSensorStatusColor } from "../utils/roomHelpers";
 
 const ROOM_TYPE_STYLE = {
-  classroom: { color: "#4ea8de", depth: 2.4 },
-  lab_small: { color: "#80ed99", depth: 2.4 },
-  lab_medium: { color: "#ffd166", depth: 2.4 }
+  classroom: { color: "#9cff57", depth: 2.4 },
+  lab_small: { color: "#ff8c42", depth: 2.4 },
+  lab_medium: { color: "#69d2ff", depth: 2.4 }
 };
 
 const TOTAL_MODEL_WIDTH = SECTION_COUNT * SECTION_WIDTH + (SECTION_COUNT - 1) * SECTION_GAP;
@@ -71,7 +71,7 @@ function BuildingShell({ width, depth }) {
             </mesh>
             <mesh position={[0, slabY + 0.14, 0]}>
               <boxGeometry args={[width * 0.98, 0.03, depth * 0.98]} />
-              <meshBasicMaterial color="#6fe8ff" transparent opacity={0.36} />
+              <meshBasicMaterial color="#baff4d" transparent opacity={0.22} />
             </mesh>
           </group>
         );
@@ -80,22 +80,22 @@ function BuildingShell({ width, depth }) {
       {/* Wing-style facade massing inspired by the real N-block front profile */}
       <mesh position={[-width * 0.34, coreY, 0]}>
         <boxGeometry args={[wingWidth, buildingHeight, wingDepth]} />
-        <meshStandardMaterial color="#ad7a66" transparent opacity={0.12} depthWrite={false} />
+        <meshStandardMaterial color="#4b6a58" transparent opacity={0.14} depthWrite={false} />
       </mesh>
       <mesh position={[0, coreY, 0]}>
         <boxGeometry args={[wingWidth * 1.1, buildingHeight, wingDepth]} />
-        <meshStandardMaterial color="#6d808d" transparent opacity={0.1} depthWrite={false} />
+        <meshStandardMaterial color="#5b4d67" transparent opacity={0.12} depthWrite={false} />
       </mesh>
       <mesh position={[width * 0.34, coreY, 0]}>
         <boxGeometry args={[wingWidth, buildingHeight, wingDepth]} />
-        <meshStandardMaterial color="#ad7a66" transparent opacity={0.12} depthWrite={false} />
+        <meshStandardMaterial color="#4b6a58" transparent opacity={0.14} depthWrite={false} />
       </mesh>
 
       {/* Vertical core towers between sections */}
       {getGapCenters().map((x, idx) => (
         <mesh key={`shell-core-${idx}`} position={[x, coreY + 0.2, 0]}>
           <boxGeometry args={[SECTION_GAP * 0.9, coreHeight, depth * 0.8]} />
-          <meshStandardMaterial color="#7b8e99" transparent opacity={0.12} depthWrite={false} />
+          <meshStandardMaterial color="#8f6b4a" transparent opacity={0.13} depthWrite={false} />
         </mesh>
       ))}
 
@@ -103,7 +103,7 @@ function BuildingShell({ width, depth }) {
       {[...Array(FLOOR_COUNT)].map((_, index) => (
         <mesh key={`facade-band-${index}`} position={[0, index * FLOOR_HEIGHT + 0.9, -halfDepth + 0.35]}>
           <boxGeometry args={[bandWidth, 0.18, 0.22]} />
-          <meshBasicMaterial color="#93def5" transparent opacity={0.3} />
+          <meshBasicMaterial color="#ffb347" transparent opacity={0.2} />
         </mesh>
       ))}
 
@@ -146,11 +146,11 @@ function ArchitecturalGuides({ depth, showDividers, showCores, hoveredCore, onHo
         ? gapCenters.flatMap((x, idx) => [
             <mesh key={`divider-plane-${idx}`} position={[x, ((FLOOR_COUNT - 1) * FLOOR_HEIGHT + 2) * 0.5, 0]}>
               <boxGeometry args={[0.22, (FLOOR_COUNT - 1) * FLOOR_HEIGHT + 2, depth * 0.98]} />
-              <meshStandardMaterial color="#80edff" emissive="#67d8ff" emissiveIntensity={0.35} transparent opacity={0.26} />
+              <meshStandardMaterial color="#c3ff5c" emissive="#8dff45" emissiveIntensity={0.25} transparent opacity={0.16} />
             </mesh>,
             <mesh key={`divider-glow-${idx}`} position={[x, ((FLOOR_COUNT - 1) * FLOOR_HEIGHT + 2) * 0.5, 0]}>
               <boxGeometry args={[0.5, (FLOOR_COUNT - 1) * FLOOR_HEIGHT + 2, depth * 0.2]} />
-              <meshBasicMaterial color="#6dd3ff" transparent opacity={0.18} />
+              <meshBasicMaterial color="#ff9155" transparent opacity={0.13} />
             </mesh>
           ])
         : null}
@@ -174,7 +174,7 @@ function ArchitecturalGuides({ depth, showDividers, showCores, hoveredCore, onHo
                   <boxGeometry args={[SECTION_GAP * 0.82, (FLOOR_COUNT - 1) * FLOOR_HEIGHT + 2, depth * 0.72]} />
                   <meshStandardMaterial
                     color={active ? "#8cf8ff" : "#47a8bd"}
-                    emissive="#5de2ff"
+                    emissive="#ffd24a"
                     emissiveIntensity={active ? 0.52 : 0.24}
                     transparent
                     opacity={0.3}
@@ -182,7 +182,7 @@ function ArchitecturalGuides({ depth, showDividers, showCores, hoveredCore, onHo
                 </mesh>
                 <mesh>
                   <boxGeometry args={[SECTION_GAP * 0.9, (FLOOR_COUNT - 1) * FLOOR_HEIGHT + 2.05, depth * 0.78]} />
-                  <meshBasicMaterial color="#7dd9ff" wireframe transparent opacity={0.52} />
+                  <meshBasicMaterial color="#ffc46b" wireframe transparent opacity={0.42} />
                 </mesh>
               </group>
             );
@@ -220,7 +220,7 @@ function RoomBoundaries({ rooms, positions, showRoomIds }) {
                 position={[0, 0.04, 0]}
                 rotation={[-Math.PI / 2, 0, 0]}
                 fontSize={Math.max(0.35, Math.min(0.56, boundaryWidth * 0.16))}
-                color="#dffbff"
+                color="#f6f8ff"
                 anchorX="center"
                 anchorY="middle"
                 maxWidth={boundaryWidth * 0.86}
@@ -365,10 +365,10 @@ export default function ThreeDMap({ rooms, readings, selectedRoomId, onSelectRoo
     <section className="map-panel">
       <div className="map-canvas-wrap">
         <Canvas camera={{ position: cameraPosition, fov: 45 }}>
-          <color attach="background" args={["#0b132b"]} />
-          <ambientLight intensity={0.75} />
-          <directionalLight position={[20, 30, 16]} intensity={1.2} />
-          <pointLight position={[0, 22, 0]} intensity={1.1} color="#4fd8ff" />
+          <color attach="background" args={["#0b1016"]} />
+          <ambientLight intensity={0.95} />
+          <directionalLight position={[20, 30, 16]} intensity={1} />
+          <pointLight position={[0, 22, 0]} intensity={0.7} color="#d6ff62" />
           <BuildingShell width={buildingSize.width} depth={buildingSize.depth} />
           <ArchitecturalGuides
             depth={buildingSize.depth}

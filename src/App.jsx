@@ -74,14 +74,14 @@ export default function App() {
           <p className="eyebrow">Smart Campus Monitoring</p>
           <h1>N Block Environmental Dashboard</h1>
           <p className="hero-text">
-            Live telemetry across all 53 monitored spaces with historical trends and an interactive 3D sensor map.
+            Live telemetry across all 53 monitored spaces — historical trends and an interactive 3D sensor map.
           </p>
         </div>
 
         <div className="status-box">
-          <p>Last updated</p>
+          <p>⏱ Last updated</p>
           <strong>{formatTimestamp(lastUpdated)}</strong>
-          <button onClick={refresh}>Refresh now</button>
+          <button onClick={refresh}>↻ Refresh now</button>
         </div>
       </header>
 
@@ -91,8 +91,8 @@ export default function App() {
       <AlertBanner readings={readings} />
 
       <nav className="top-nav">
-        <NavLink to="/" end className={({ isActive }) => (isActive ? "active" : "")}>Dashboard</NavLink>
-        <NavLink to="/map-3d" className={({ isActive }) => (isActive ? "active" : "")}>3D Sensor Map</NavLink>
+        <NavLink to="/" end className={({ isActive }) => (isActive ? "active" : "")}>⬡ Dashboard</NavLink>
+        <NavLink to="/map-3d" className={({ isActive }) => (isActive ? "active" : "")}>◈ 3D Sensor Map</NavLink>
       </nav>
 
       {loading ? <p className="loading">Loading latest readings...</p> : null}

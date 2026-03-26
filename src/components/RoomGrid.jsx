@@ -1,5 +1,9 @@
 import RoomCard from "./RoomCard";
 
+function sortByRoomId(a, b) {
+  return a.roomId.localeCompare(b.roomId, undefined, { numeric: true, sensitivity: "base" });
+}
+
 function N506Group({ rooms, roomMap, onOpenDetail }) {
   const combinedOccupancy = rooms.reduce((sum, room) => sum + (room.occupancy || 0), 0);
   const combinedCapacity = 140;
@@ -32,8 +36,12 @@ export default function RoomGrid({ readings, rooms, floor, onOpenDetail }) {
     return acc;
   }, {});
 
-  const n506Rooms = readings.filter((r) => roomMap[r.roomId]?.parentRoom === "N-506");
-  const regularRooms = readings.filter((r) => roomMap[r.roomId]?.parentRoom !== "N-506");
+  const n506Rooms = readings
+    .filter((r) => roomMap[r.roomId]?.parentRoom === "N-506")
+    .sort(sortByRoomId);
+  const regularRooms = readings
+    .filter((r) => roomMap[r.roomId]?.parentRoom !== "N-506")
+    .sort(sortByRoomId);
 
   return (
     <div className="room-grid-wrapper">

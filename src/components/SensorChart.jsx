@@ -14,27 +14,27 @@ const METRIC_CONFIG = {
   temperature: {
     label: "Temperature",
     unit: "degC",
-    color: "#ff9f43",
+    color: "#ff8c42",
     domain: [18, 45],
     threshold: 40
   },
   humidity: {
     label: "Humidity",
     unit: "%",
-    color: "#7ae582",
+    color: "#9cff57",
     domain: [20, 90]
   },
   co2: {
     label: "CO2",
     unit: "ppm",
-    color: "#ffd166",
+    color: "#69d2ff",
     domain: [300, 1400],
     threshold: 900
   },
   occupancyPct: {
     label: "Occupancy",
     unit: "%",
-    color: "#70d6ff",
+    color: "#ff6a7a",
     domain: [0, 120],
     threshold: 80
   }
@@ -74,9 +74,9 @@ export default function SensorChart({ data, metric = "temperature" }) {
               <stop offset="85%" stopColor={metricConfig.color} stopOpacity={0.04} />
             </linearGradient>
           </defs>
-          <CartesianGrid strokeDasharray="4 4" stroke="rgba(255, 255, 255, 0.15)" />
-          <XAxis dataKey="time" tick={{ fill: "#d6f0ef", fontSize: 11 }} />
-          <YAxis domain={metricConfig.domain} tick={{ fill: "#d6f0ef", fontSize: 11 }} />
+          <CartesianGrid strokeDasharray="4 4" stroke="rgba(55, 65, 81, 0.14)" />
+          <XAxis dataKey="time" tick={{ fill: "#4b5563", fontSize: 11 }} />
+          <YAxis domain={metricConfig.domain} tick={{ fill: "#4b5563", fontSize: 11 }} />
           <Tooltip content={<TrendTooltip metricConfig={metricConfig} />} />
           <Legend />
           <Area
@@ -94,7 +94,7 @@ export default function SensorChart({ data, metric = "temperature" }) {
               y={metricConfig.threshold}
               stroke="#ff595e"
               strokeDasharray="5 5"
-              label={{ value: "Alert", position: "insideTopRight", fill: "#ffd0d1", fontSize: 11 }}
+              label={{ value: "Alert", position: "insideTopRight", fill: "#9f1239", fontSize: 11 }}
             />
           ) : null}
         </AreaChart>
