@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { fetchLatestReadings } from "../api/sensors";
 import { groupByFloor } from "../utils/roomHelpers";
 
-export function useLiveReadings(intervalMs = 30000) {
+export function useLiveReadings(intervalMs = 300000) {
   const [readings, setReadings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");

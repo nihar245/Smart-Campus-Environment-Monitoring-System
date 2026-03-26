@@ -31,7 +31,7 @@ export default function App() {
   const [rooms, setRooms] = useState(DEFAULT_ROOMS);
   const [roomsError, setRoomsError] = useState("");
 
-  const { readings, readingsByFloor, loading, error, lastUpdated, refresh } = useLiveReadings(30000);
+  const { readings, readingsByFloor, loading, error, lastUpdated, refresh } = useLiveReadings(300000);
 
   useEffect(() => {
     let mounted = true;

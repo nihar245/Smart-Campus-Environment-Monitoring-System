@@ -237,7 +237,7 @@ export default function ThreeDMap({ rooms, readings, selectedRoomId, onSelectRoo
             ) : null}
             {readingsByRoom[infoRoomId] ? (
               <p>
-                Temp {readingsByRoom[infoRoomId].temperature.toFixed(1)}°C, CO₂ {readingsByRoom[infoRoomId].co2} ppm
+                Temp {Number(readingsByRoom[infoRoomId].temperature).toFixed(1)}°C, CO₂ {Number(readingsByRoom[infoRoomId].co2)} ppm
               </p>
             ) : (
               <p>No live reading currently available.</p>

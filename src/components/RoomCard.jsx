@@ -20,11 +20,11 @@ export default function RoomCard({ reading, roomConfig, onOpenDetail }) {
 
       <div className="room-metrics">
         <p>
-          <strong>{reading.temperature.toFixed(1)}°C</strong>
+          <strong>{Number(reading.temperature).toFixed(1)}°C</strong>
           <span>Temperature</span>
         </p>
         <p>
-          <strong>{reading.humidity}%</strong>
+          <strong>{Number(reading.humidity).toFixed(1)}%</strong>
           <span>Humidity</span>
         </p>
         <p>
