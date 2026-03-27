@@ -19,12 +19,7 @@ export default function AlertBanner({ readings }) {
       severity: getAlertSeverity(reading.alertFlags)
     }))
     .filter((entry) => entry.alerts.length > 0)
-    .sort((a, b) => {
-      if (b.severity !== a.severity) {
-        return b.severity - a.severity;
-      }
-      return roomSorter(a, b);
-    });
+    .sort(roomSorter);
 
   if (!active.length) {
     return (

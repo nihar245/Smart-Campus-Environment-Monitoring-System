@@ -310,8 +310,7 @@ button:focus-visible {
 .alert-scroll {
   display: grid;
   gap: 6px;
-  max-height: 120px;
-  overflow-y: auto;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
 }
 
 .live-alert-item {
@@ -319,6 +318,7 @@ button:focus-visible {
   align-items: center;
   justify-content: space-between;
   gap: 14px;
+  min-width: 0;
   border-radius: var(--radius-md);
   padding: 10px 12px;
   background: var(--glass-bg);
@@ -345,6 +345,17 @@ button:focus-visible {
   flex-wrap: wrap;
   gap: 5px;
   justify-content: flex-end;
+}
+
+@media (max-width: 760px) {
+  .live-alert-item {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .live-alert-tags {
+    justify-content: flex-start;
+  }
 }
 
 .live-alert-tags span {

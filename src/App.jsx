@@ -16,6 +16,7 @@ function DashboardView({ selectedFloor, onSelectFloor, floorReadings, rooms, onO
     <>
       <FloorSelector selectedFloor={selectedFloor} onSelectFloor={onSelectFloor} />
       <FloorSummary floorReadings={floorReadings} rooms={rooms} />
+      <AlertBanner readings={floorReadings} />
       <RoomGrid floor={selectedFloor} readings={floorReadings} rooms={rooms} onOpenDetail={onOpenDetail} />
     </>
   );
@@ -87,8 +88,6 @@ export default function App() {
 
       {error ? <p className="error-text">Live feed error: {error}</p> : null}
       {roomsError ? <p className="error-text">Room config warning: {roomsError}</p> : null}
-
-      <AlertBanner readings={readings} />
 
       <nav className="top-nav">
         <NavLink to="/" end className={({ isActive }) => (isActive ? "active" : "")}>⬡ Dashboard</NavLink>
