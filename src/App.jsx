@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { NavLink, Route, Routes } from "react-router-dom";
 import { fetchRooms } from "./api/sensors";
 import AlertBanner from "./components/AlertBanner";
+import AlertsSidebar from "./components/AlertsSidebar";
 import FloorSelector from "./components/FloorSelector";
 import FloorSummary from "./components/FloorSummary";
 import RoomDetailModal from "./components/RoomDetailModal";
@@ -29,6 +30,7 @@ function ThreeDView({ rooms, readings, selectedRoomId, onSelectRoom }) {
 export default function App() {
   const [selectedFloor, setSelectedFloor] = useState(1);
   const [selectedRoomId, setSelectedRoomId] = useState("");
+  const [isAlertsSidebarOpen, setIsAlertsSidebarOpen] = useState(false);
   const [rooms, setRooms] = useState(DEFAULT_ROOMS);
   const [roomsError, setRoomsError] = useState("");
 
@@ -70,6 +72,14 @@ export default function App() {
 
   return (
     <main className="app-shell">
+      <AlertsSidebar
+        readings={readings}
+        isOpen={isAlertsSidebarOpen}
+        onToggle={() => setIsAlertsSidebarOpen((open) => !open)}
+        onClose={() => setIsAlertsSidebarOpen(false)}
+        onOpenDetail={setSelectedRoomId}
+      />
+
       <header className="hero">
         <div>
           <p className="eyebrow">Smart Campus Monitoring</p>
