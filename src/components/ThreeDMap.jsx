@@ -365,10 +365,12 @@ export default function ThreeDMap({ rooms, readings, selectedRoomId, onSelectRoo
     <section className="map-panel">
       <div className="map-canvas-wrap">
         <Canvas camera={{ position: cameraPosition, fov: 45 }}>
-          <color attach="background" args={["#0b1016"]} />
-          <ambientLight intensity={0.95} />
-          <directionalLight position={[20, 30, 16]} intensity={1} />
-          <pointLight position={[0, 22, 0]} intensity={0.7} color="#d6ff62" />
+          <color attach="background" args={["#07090f"]} />
+          <ambientLight intensity={0.8} />
+          <directionalLight position={[20, 30, 16]} intensity={1.05} color="#d7ff5c" />
+          <pointLight position={[0, 22, 0]} intensity={0.85} color="#d6ff62" />
+          <pointLight position={[-20, 10, 12]} intensity={0.42} color="#ff7f50" />
+          <pointLight position={[16, 6, -14]} intensity={0.32} color="#66d6ff" />
           <BuildingShell width={buildingSize.width} depth={buildingSize.depth} />
           <ArchitecturalGuides
             depth={buildingSize.depth}

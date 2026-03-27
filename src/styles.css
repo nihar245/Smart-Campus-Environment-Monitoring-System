@@ -836,16 +836,17 @@ button:focus-visible {
   border: 1px solid rgba(59, 130, 246, 0.15);
   min-height: 580px;
   background:
-    radial-gradient(ellipse 60% 40% at 20% 20%, rgba(59,130,246,0.08), transparent 55%),
-    radial-gradient(ellipse 50% 50% at 80% 80%, rgba(16,185,129,0.06), transparent 55%),
-    linear-gradient(160deg, #0a0d14, #0d1118);
+    radial-gradient(ellipse 58% 42% at 14% 12%, rgba(215,255,82,0.2), transparent 58%),
+    radial-gradient(ellipse 54% 46% at 86% 84%, rgba(255,127,80,0.18), transparent 56%),
+    radial-gradient(ellipse 52% 44% at 78% 20%, rgba(102,214,255,0.16), transparent 56%),
+    linear-gradient(160deg, #070a10, #101321);
   box-shadow: var(--shadow-lg);
 }
 
 .map-legend {
   border-radius: var(--radius-xl);
   padding: 18px;
-  background: var(--card-bg);
+  background: linear-gradient(160deg, rgba(17, 21, 34, 0.9), rgba(18, 16, 28, 0.9));
   border: 1px solid var(--card-border);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
@@ -886,9 +887,9 @@ button:focus-visible {
 .dot.warning   { background: var(--warning); box-shadow: 0 0 6px var(--warning); }
 .dot.danger    { background: var(--danger); box-shadow: 0 0 6px var(--danger); }
 .dot.core      { background: #f87171; }
-.dot.classroom { background: #4ade80; }
-.dot.lab-small { background: #fb923c; }
-.dot.lab-medium{ background: #67e8f9; }
+.dot.classroom { background: #9cff57; box-shadow: 0 0 7px #9cff57; }
+.dot.lab-small { background: #ff8c42; box-shadow: 0 0 7px #ff8c42; }
+.dot.lab-medium{ background: #69d2ff; box-shadow: 0 0 7px #69d2ff; }
 
 .boundary-title {
   margin: 14px 0 8px;
