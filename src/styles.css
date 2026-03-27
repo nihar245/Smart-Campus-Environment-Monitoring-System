@@ -124,6 +124,35 @@ h1 {
   padding: 32px 0 56px;
 }
 
+.main-content-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 360px;
+  align-items: start;
+  gap: 20px;
+}
+
+.primary-section {
+  min-width: 0;
+}
+
+.alerts-section {
+  min-width: 0;
+}
+
+.alerts-section .alert-banner {
+  margin: 0;
+}
+
+@media (max-width: 1080px) {
+  .main-content-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .alerts-section .alert-banner {
+    margin-top: 16px;
+  }
+}
+
 /* ─── Hero / Header ─────────────────────────────────────── */
 .hero {
   display: flex;

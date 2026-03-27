@@ -2,7 +2,6 @@ import { useEffect, useMemo, useState } from "react";
 import { NavLink, Route, Routes } from "react-router-dom";
 import { fetchRooms } from "./api/sensors";
 import AlertBanner from "./components/AlertBanner";
-import AlertsSidebar from "./components/AlertsSidebar";
 import FloorSelector from "./components/FloorSelector";
 import FloorSummary from "./components/FloorSummary";
 import RoomDetailModal from "./components/RoomDetailModal";
@@ -17,7 +16,6 @@ function DashboardView({ selectedFloor, onSelectFloor, floorReadings, rooms, onO
     <>
       <FloorSelector selectedFloor={selectedFloor} onSelectFloor={onSelectFloor} />
       <FloorSummary floorReadings={floorReadings} rooms={rooms} />
-      <AlertBanner readings={floorReadings} />
       <RoomGrid floor={selectedFloor} readings={floorReadings} rooms={rooms} onOpenDetail={onOpenDetail} />
     </>
   );
@@ -30,7 +28,6 @@ function ThreeDView({ rooms, readings, selectedRoomId, onSelectRoom }) {
 export default function App() {
   const [selectedFloor, setSelectedFloor] = useState(1);
   const [selectedRoomId, setSelectedRoomId] = useState("");
-  const [isAlertsSidebarOpen, setIsAlertsSidebarOpen] = useState(false);
   const [rooms, setRooms] = useState(DEFAULT_ROOMS);
   const [roomsError, setRoomsError] = useState("");
 
@@ -72,14 +69,6 @@ export default function App() {
 
   return (
     <main className="app-shell">
-      <AlertsSidebar
-        readings={readings}
-        isOpen={isAlertsSidebarOpen}
-        onToggle={() => setIsAlertsSidebarOpen((open) => !open)}
-        onClose={() => setIsAlertsSidebarOpen(false)}
-        onOpenDetail={setSelectedRoomId}
-      />
-
       <header className="hero">
         <div>
           <p className="eyebrow">Smart Campus Monitoring</p>
@@ -99,31 +88,39 @@ export default function App() {
       {error ? <p className="error-text">Live feed error: {error}</p> : null}
       {roomsError ? <p className="error-text">Room config warning: {roomsError}</p> : null}
 
-      <nav className="top-nav">
-        <NavLink to="/" end className={({ isActive }) => (isActive ? "active" : "")}>⬡ Dashboard</NavLink>
-        <NavLink to="/map-3d" className={({ isActive }) => (isActive ? "active" : "")}>◈ 3D Sensor Map</NavLink>
-      </nav>
+      <section className="main-content-layout">
+        <section className="primary-section">
+          <nav className="top-nav">
+            <NavLink to="/" end className={({ isActive }) => (isActive ? "active" : "")}>⬡ Dashboard</NavLink>
+            <NavLink to="/map-3d" className={({ isActive }) => (isActive ? "active" : "")}>◈ 3D Sensor Map</NavLink>
+          </nav>
 
-      {loading ? <p className="loading">Loading latest readings...</p> : null}
+          {loading ? <p className="loading">Loading latest readings...</p> : null}
 
-      <Routes>
-        <Route
-          path="/"
-          element={
-            <DashboardView
-              selectedFloor={selectedFloor}
-              onSelectFloor={setSelectedFloor}
-              floorReadings={floorReadings}
-              rooms={rooms}
-              onOpenDetail={setSelectedRoomId}
+          <Routes>
+            <Route
+              path="/"
+              element={
+                <DashboardView
+                  selectedFloor={selectedFloor}
+                  onSelectFloor={setSelectedFloor}
+                  floorReadings={floorReadings}
+                  rooms={rooms}
+                  onOpenDetail={setSelectedRoomId}
+                />
+              }
             />
-          }
-        />
-        <Route
-          path="/map-3d"
-          element={<ThreeDView rooms={rooms} readings={readings} selectedRoomId={selectedRoomId} onSelectRoom={setSelectedRoomId} />}
-        />
-      </Routes>
+            <Route
+              path="/map-3d"
+              element={<ThreeDView rooms={rooms} readings={readings} selectedRoomId={selectedRoomId} onSelectRoom={setSelectedRoomId} />}
+            />
+          </Routes>
+        </section>
+
+        <aside className="alerts-section" aria-label="Live alerts">
+          <AlertBanner readings={readings} />
+        </aside>
+      </section>
 
       {activeRoom ? <RoomDetailModal roomId={activeRoom} onClose={() => setSelectedRoomId("")} /> : null}
     </main>
